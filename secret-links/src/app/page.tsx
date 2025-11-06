@@ -140,7 +140,7 @@ export default function SecretLinkGenerator() {
           <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/30 rounded-lg p-8 glow">
             <div className="text-center mb-8">
               <Shield className="w-16 h-16 text-blue-400 mx-auto mb-4" />
-              <h1 className="text-2xl font-bold text-white mb-2">Secret Link Generator</h1>
+              <h1 className="text-2xl font-bold text-white mb-2">Clutch Sign-up Generator</h1>
               <p className="text-gray-400">Enter master password to access</p>
             </div>
 
@@ -190,7 +190,7 @@ export default function SecretLinkGenerator() {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center space-x-3">
             <LinkIcon className="w-8 h-8 text-blue-400" />
-            <h1 className="text-3xl font-bold text-white">Secret Link Generator</h1>
+            <h1 className="text-3xl font-bold text-white">Clutch Sign-up Generator</h1>
           </div>
           <button
             onClick={logout}
@@ -204,15 +204,15 @@ export default function SecretLinkGenerator() {
         <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/30 rounded-lg p-6 mb-8 glow">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-xl font-semibold text-white mb-2">Generate New Secret Link</h2>
-              <p className="text-gray-400">Creates a unique link that expires in 15 minutes</p>
+              <h2 className="text-xl font-semibold text-white mb-2">Generate Sign-up Link</h2>
+              <p className="text-gray-400">Creates an exclusive sign-up invitation that expires in 15 minutes</p>
             </div>
             <button
               onClick={generateSecretLink}
               className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors glow flex items-center space-x-2"
             >
               <Key className="w-5 h-5" />
-              <span>Generate Link</span>
+              <span>Generate Invitation</span>
             </button>
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function SecretLinkGenerator() {
         {/* Links List */}
         <div className="bg-gray-800/50 backdrop-blur-sm border border-blue-500/30 rounded-lg p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-white">Generated Links</h2>
+            <h2 className="text-xl font-semibold text-white">Sign-up Invitations</h2>
             {secretLinks.some(link => link.isExpired) && (
               <button
                 onClick={clearExpiredLinks}
@@ -235,7 +235,7 @@ export default function SecretLinkGenerator() {
           {secretLinks.length === 0 ? (
             <div className="text-center py-12">
               <Clock className="w-16 h-16 text-gray-500 mx-auto mb-4" />
-              <p className="text-gray-400">No secret links generated yet</p>
+              <p className="text-gray-400">No sign-up invitations generated yet</p>
             </div>
           ) : (
             <div className="space-y-4">

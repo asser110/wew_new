@@ -131,18 +131,67 @@ export default function SecretPage() {
           </div>
 
           {/* Secret Content */}
+          {/* Sign-up Form */}
           <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 border border-blue-500/30 rounded-lg p-6">
             <Shield className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-            <h2 className="text-lg font-semibold text-white mb-2">Secret Content</h2>
-            <p className="text-gray-300 text-sm mb-4">
-              This is your secret content that can only be accessed through this temporary link.
+            <h2 className="text-lg font-semibold text-white mb-4">Join Clutch Platform</h2>
+            <p className="text-gray-300 text-sm mb-6">
+              You've been invited to join Clutch! This exclusive sign-up link expires in {timeRemaining}.
             </p>
-            <div className="bg-black/30 rounded p-4 font-mono text-sm text-green-400">
-              🔐 SECRET DATA: CLUTCH_ACCESS_GRANTED_2024
-              <br />
-              🎯 Mission: Operation Pixel Storm
-              <br />
-              🔑 Code: {link.id.slice(-8).toUpperCase()}
+            
+            <form className="space-y-4">
+              <div>
+                <label className="block text-gray-300 text-sm font-medium mb-2">Full Name</label>
+                <input
+                  type="text"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Enter your full name"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-300 text-sm font-medium mb-2">Email Address</label>
+                <input
+                  type="email"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Enter your email"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+                <input
+                  type="password"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Create a password"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-gray-300 text-sm font-medium mb-2">Confirm Password</label>
+                <input
+                  type="password"
+                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                  placeholder="Confirm your password"
+                  required
+                />
+              </div>
+              
+              <button
+                type="submit"
+                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors glow"
+              >
+                Create Account
+              </button>
+            </form>
+            
+            <div className="mt-4 text-center">
+              <p className="text-gray-400 text-xs">
+                Invitation Code: <span className="text-blue-400 font-mono">{link.id.slice(-8).toUpperCase()}</span>
+              </p>
             </div>
           </div>
 

@@ -5,8 +5,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Secret Link Generator',
-  description: 'Generate temporary secret links that expire every 15 minutes',
+  title: 'Clutch Sign-up Generator',
+  description: 'Generate exclusive sign-up invitations that expire every 15 minutes',
 }
 
 export default function RootLayout({
