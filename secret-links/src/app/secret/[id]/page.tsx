@@ -84,7 +84,7 @@ export default function SecretPage() {
             <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
             <h1 className="text-2xl font-bold text-white mb-2">Invalid Link</h1>
             <p className="text-gray-400 mb-4">
-              This secret link is either invalid or has expired.
+              This sign-up invitation is either invalid or has expired.
             </p>
             <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
               <p className="text-red-300 text-sm">
