@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { Shield, Clock, CheckCircle, XCircle, Key } from 'lucide-react';
+import { Shield, Clock, CheckCircle, XCircle, Key, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 interface SecretLink {
   id: string;
@@ -17,6 +17,17 @@ export default function SecretPage() {
   const [link, setLink] = useState<SecretLink | null>(null);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
+  const [formData, setFormData] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
 
   useEffect(() => {
     const linkId = params.id as string;
@@ -65,6 +76,61 @@ export default function SecretPage() {
     }
   }, [link]);
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSignUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setIsLoading(true);
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:3001/api/auth/send-verification', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          username: formData.fullName,
+          invitationCode: link?.id
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+      } else {
+        setError(data.message || 'Sign-up failed. Please try again.');
+      }
+    } catch (error) {
+      setError('Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isValid === null) {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
@@ -91,6 +157,35 @@ export default function SecretPage() {
                 Secret links expire after 15 minutes for security purposes.
               </p>
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (success) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-md">
+          <div className="bg-gray-800/50 backdrop-blur-sm border border-green-500/30 rounded-lg p-8 text-center glow">
+            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <h1 className="text-2xl font-bold text-white mb-2">Account Created!</h1>
+            <p className="text-gray-400 mb-6">
+              Your Clutch account has been created successfully. A verification email has been sent to your email address.
+            </p>
+            
+            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-6">
+              <p className="text-green-300 text-sm">
+                ✅ Check your email for a verification code to complete the login process.
+              </p>
+            </div>
+            
+            <a
+              href="http://localhost:3000"
+              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors glow"
+            >
+              Go to Clutch Login
+            </a>
           </div>
         </div>
       </div>
@@ -139,52 +234,107 @@ export default function SecretPage() {
               You've been invited to join Clutch! This exclusive sign-up link expires in {timeRemaining}.
             </p>
             
-            <form className="space-y-4">
+            {error && (
+              <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded text-red-300 text-sm">
+                {error}
+              </div>
+            )}
+            
+            <form onSubmit={handleSignUp} className="space-y-4">
               <div>
                 <label className="block text-gray-300 text-sm font-medium mb-2">Full Name</label>
-                <input
-                  type="text"
-                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                  placeholder="Enter your full name"
-                  required
-                />
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    name="fullName"
+                    value={formData.fullName}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                    placeholder="Enter your full name"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
                 <label className="block text-gray-300 text-sm font-medium mb-2">Email Address</label>
-                <input
-                  type="email"
-                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                  placeholder="Enter your email"
-                  required
-                />
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                    placeholder="Enter your email"
+                    required
+                  />
+                </div>
               </div>
               
               <div>
                 <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
-                <input
-                  type="password"
-                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                  placeholder="Create a password"
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                    placeholder="Create a password (min 6 characters)"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
               
               <div>
                 <label className="block text-gray-300 text-sm font-medium mb-2">Confirm Password</label>
-                <input
-                  type="password"
-                  className="w-full bg-gray-800/50 border border-gray-600 rounded-lg px-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                  placeholder="Confirm your password"
-                  required
-                />
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
+                  <input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
+                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
+                    placeholder="Confirm your password"
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                  >
+                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
               
               <button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors glow"
+                disabled={isLoading}
+                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors glow flex items-center justify-center space-x-2"
               >
-                Create Account
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    <span>Creating Account...</span>
+                  </>
+                ) : (
+                  <>
+                    <Key className="w-4 h-4" />
+                    <span>Create Account</span>
+                  </>
+                )}
               </button>
             </form>
             
