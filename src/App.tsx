@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { LogIn, Key, Clock, Copy, Eye, EyeOff, Shield, Link as LinkIcon, Trash2 } from 'lucide-react';
 import LoginPage from './components/LoginPage';
+import SecretSignupPage from './components/SecretSignupPage';
 import { v4 as uuidv4 } from 'uuid';
 
 interface SecretLink {
@@ -12,6 +13,7 @@ interface SecretLink {
 }
 
 function App() {
+  const [currentPath, setCurrentPath] = useState(window.location.pathname);
   const [showLogin, setShowLogin] = useState(false);
   const [showSecretGenerator, setShowSecretGenerator] = useState(false);
   const [topLeftText, setTopLeftText] = useState('');
@@ -34,6 +36,13 @@ function App() {
   const centerTarget = 'welcome to clutch';
 
   useEffect(() => {
+    // Listen for URL changes
+    const handlePopState = () => {
+      setCurrentPath(window.location.pathname);
+    };
+    
+    window.addEventListener('popstate', handlePopState);
+    
     // Check if already authenticated for secret generator
     const auth = localStorage.getItem('secretLinkAuth');
     if (auth === 'authenticated') {
@@ -81,6 +90,7 @@ function App() {
     return () => {
       clearInterval(topLeftInterval);
       clearInterval(interval);
+      window.removeEventListener('popstate', handlePopState);
     };
   }, []);
 
@@ -159,6 +169,13 @@ function App() {
     setSecretLinks(activeLinks);
     localStorage.setItem('secretLinks', JSON.stringify(activeLinks));
   };
+
+  // Check if current path is a secret link
+  const secretMatch = currentPath.match(/^\/secret\/(.+)$/);
+  if (secretMatch) {
+    const linkId = secretMatch[1];
+    return <SecretSignupPage linkId={linkId} />;
+  }
 
   const logout = () => {
     setIsAuthenticated(false);
