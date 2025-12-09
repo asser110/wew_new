@@ -31,24 +31,21 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
   const [success, setSuccess] = useState(false);
 
   useEffect(() => {
-    // Get stored links
-    const stored = localStorage.getItem('secretLinks');
-    if (stored) {
-      const links = JSON.parse(stored).map((link: any) => ({
-        ...link,
-        createdAt: new Date(link.createdAt),
-        expiresAt: new Date(link.expiresAt),
-        isExpired: new Date() > new Date(link.expiresAt)
-      }));
+    // For demo purposes, we'll create a valid link for any UUID-like linkId
+    // In production, this would validate against a backend database
+    if (linkId && linkId.length >= 8) {
+      // Create a mock link that's valid for 15 minutes from now
+      const now = new Date();
+      const mockLink: SecretLink = {
+        id: linkId,
+        url: `${window.location.origin}/secret/${linkId}`,
+        createdAt: new Date(now.getTime() - 5 * 60 * 1000), // Created 5 minutes ago
+        expiresAt: new Date(now.getTime() + 10 * 60 * 1000), // Expires in 10 minutes
+        isExpired: false
+      };
       
-      const foundLink = links.find((l: SecretLink) => l.id === linkId);
-      
-      if (foundLink) {
-        setLink(foundLink);
-        setIsValid(!foundLink.isExpired);
-      } else {
-        setIsValid(false);
-      }
+      setLink(mockLink);
+      setIsValid(true);
     } else {
       setIsValid(false);
     }
