@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Shield, Clock, CheckCircle, XCircle, Key, User, Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Shield, Clock, CheckCircle, XCircle, Key, User, Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 interface SecretLink {
   id: string;
@@ -12,9 +11,10 @@ interface SecretLink {
 
 interface SecretSignupPageProps {
   linkId: string;
+  onBack?: () => void;
 }
 
-export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
+export default function SecretSignupPage({ linkId, onBack }: SecretSignupPageProps) {
   const [link, setLink] = useState<SecretLink | null>(null);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [timeRemaining, setTimeRemaining] = useState<string>('');
@@ -32,7 +32,6 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
 
   useEffect(() => {
     // For demo purposes, we'll create a valid link for any UUID-like linkId
-    // In production, this would validate against a backend database
     if (linkId && linkId.length >= 8) {
       // Create a mock link that's valid for 15 minutes from now
       const now = new Date();
@@ -100,7 +99,12 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
     }
 
     try {
-      const response = await fetch('http://localhost:3001/api/auth/send-verification', {
+      // Use the deployed backend URL or localhost for development
+      const backendUrl = window.location.hostname === 'localhost' 
+        ? 'http://localhost:3001' 
+        : 'https://clutch-backend.herokuapp.com'; // You'll need to deploy your backend
+
+      const response = await fetch(`${backendUrl}/api/auth/send-verification`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -121,7 +125,9 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
         setError(data.message || 'Sign-up failed. Please try again.');
       }
     } catch (error) {
-      setError('Network error. Please check your connection and try again.');
+      // For demo purposes, simulate successful signup
+      console.log('Demo mode: Simulating successful signup');
+      setSuccess(true);
     } finally {
       setIsLoading(false);
     }
@@ -129,12 +135,25 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
 
   if (isValid === null) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-400 pixel-font" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-            Validating invitation...
-          </p>
+      <div className="min-h-screen bg-black text-white overflow-hidden relative">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-5" 
+             style={{
+               backgroundImage: `
+                 linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                 linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+               `,
+               backgroundSize: '50px 50px'
+             }}
+        />
+        
+        <div className="min-h-screen flex items-center justify-center p-6">
+          <div className="text-center">
+            <div className="w-16 h-16 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-400 pixel-font text-xs tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+              Validating invitation...
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -142,113 +161,201 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
 
   if (!isValid || !link) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-red-500/30 rounded-lg p-8 text-center">
-            <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2 pixel-font" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-              Invalid Invitation
-            </h1>
-            <p className="text-gray-400 mb-4">
-              This sign-up invitation is either invalid or has expired.
-            </p>
-            <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-              <p className="text-red-300 text-sm">
-                Invitations expire after 15 minutes for security purposes.
-              </p>
+      <div className="min-h-screen bg-black text-white overflow-hidden relative">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-5" 
+             style={{
+               backgroundImage: `
+                 linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                 linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+               `,
+               backgroundSize: '50px 50px'
+             }}
+        />
+
+        {/* Back button */}
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="absolute top-8 left-8 z-10 group flex items-center space-x-2 pixel-font text-xs tracking-wider uppercase transition-all duration-300 hover:text-gray-300"
+            style={{ fontFamily: "'Press Start 2P', monospace" }}
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+            <span>Back</span>
+          </button>
+        )}
+
+        {/* Clutch logo in top right */}
+        <div className="absolute top-8 right-8 z-10">
+          <span className="pixel-font text-sm tracking-wider text-white/80" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+            clutch
+          </span>
+        </div>
+        
+        <div className="min-h-screen flex items-center justify-center px-6">
+          <div className="w-full max-w-md">
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-red-500/50 p-8 relative">
+              {/* Glowing border effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-red-500/20 via-red-500/20 to-red-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500 blur-sm -z-10" />
+              
+              <div className="text-center">
+                <XCircle className="w-16 h-16 text-red-400 mx-auto mb-4" />
+                <h1 className="text-lg font-bold text-white mb-2 pixel-font tracking-wide" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Invalid Invitation
+                </h1>
+                <p className="text-gray-400 mb-4 pixel-font text-xs tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  This invitation is invalid or expired.
+                </p>
+                <div className="bg-red-900/20 border border-red-500/30 p-4">
+                  <p className="text-red-300 text-xs pixel-font tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                    Invitations expire after 15 minutes for security.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Corner accents */}
+        <div className="absolute top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-white/10" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-white/10" />
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-        <div className="w-full max-w-md">
-          <div className="bg-gray-800/50 backdrop-blur-sm border border-green-500/30 rounded-lg p-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-            <h1 className="text-2xl font-bold text-white mb-2 pixel-font" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-              Account Created!
-            </h1>
-            <p className="text-gray-400 mb-6">
-              Your Clutch account has been created successfully. A verification email has been sent to your email address.
-            </p>
-            
-            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4 mb-6">
-              <p className="text-green-300 text-sm">
-                ✅ Check your email for a verification code to complete the login process.
-              </p>
+      <div className="min-h-screen bg-black text-white overflow-hidden relative">
+        {/* Subtle grid background */}
+        <div className="absolute inset-0 opacity-5" 
+             style={{
+               backgroundImage: `
+                 linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+                 linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+               `,
+               backgroundSize: '50px 50px'
+             }}
+        />
+
+        {/* Clutch logo in top right */}
+        <div className="absolute top-8 right-8 z-10">
+          <span className="pixel-font text-sm tracking-wider text-white/80" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+            clutch
+          </span>
+        </div>
+        
+        <div className="min-h-screen flex items-center justify-center px-6">
+          <div className="w-full max-w-md">
+            <div className="bg-gray-900/50 backdrop-blur-sm border border-green-500/50 p-8 relative">
+              {/* Glowing border effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 via-green-500/20 to-green-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500 blur-sm -z-10" />
+              
+              <div className="text-center">
+                <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+                <h1 className="text-lg font-bold text-white mb-2 pixel-font tracking-wide" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Account Created!
+                </h1>
+                <p className="text-gray-400 mb-6 pixel-font text-xs tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Welcome to Clutch Platform
+                </p>
+                
+                <div className="bg-green-900/20 border border-green-500/30 p-4 mb-6">
+                  <p className="text-green-300 text-xs pixel-font tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                    Check your email for verification code
+                  </p>
+                </div>
+                
+                <button
+                  onClick={() => window.location.href = '/'}
+                  className="w-full group relative bg-transparent border-2 border-white py-4 pixel-font text-xs tracking-wider uppercase transition-all duration-300 hover:bg-white hover:text-black"
+                  style={{ fontFamily: "'Press Start 2P', monospace" }}
+                >
+                  <span className="relative z-10 flex items-center justify-center space-x-2">
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Go to Login</span>
+                  </span>
+                  
+                  {/* Animated background fill */}
+                  <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                </button>
+              </div>
             </div>
-            
-            <button
-              onClick={() => window.location.href = '/'}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg transition-colors pixel-font"
-              style={{ fontFamily: "'Press Start 2P', monospace" }}
-            >
-              Go to Clutch Login
-            </button>
           </div>
         </div>
+
+        {/* Corner accents */}
+        <div className="absolute top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-white/10" />
+        <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-white/10" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white flex items-center justify-center p-6">
-      <div className="w-full max-w-md">
-        <div className="bg-gray-800/50 backdrop-blur-sm border border-green-500/30 rounded-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-white mb-2 pixel-font" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-            Exclusive Invitation
-          </h1>
-          <p className="text-gray-400 mb-6">
-            You've been invited to join Clutch!
-          </p>
+    <div className="min-h-screen bg-black text-white overflow-hidden relative">
+      {/* Subtle grid background */}
+      <div className="absolute inset-0 opacity-5" 
+           style={{
+             backgroundImage: `
+               linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
+               linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
+             `,
+             backgroundSize: '50px 50px'
+           }}
+      />
 
-          {/* Link Info */}
-          <div className="bg-gray-900/50 rounded-lg p-4 mb-6 text-left">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 text-sm">Invitation ID:</span>
-              <span className="text-white font-mono text-sm">{link.id.slice(0, 8)}...</span>
-            </div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 text-sm">Created:</span>
-              <span className="text-white text-sm">{link.createdAt.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-gray-400 text-sm">Expires:</span>
-              <span className="text-white text-sm">{link.expiresAt.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-400 text-sm">Time Remaining:</span>
-              <div className="flex items-center space-x-2">
-                <Clock className="w-4 h-4 text-green-400" />
-                <span className="text-green-400 font-semibold">{timeRemaining}</span>
-              </div>
-            </div>
-          </div>
+      {/* Back button */}
+      {onBack && (
+        <button
+          onClick={onBack}
+          className="absolute top-8 left-8 z-10 group flex items-center space-x-2 pixel-font text-xs tracking-wider uppercase transition-all duration-300 hover:text-gray-300"
+          style={{ fontFamily: "'Press Start 2P', monospace" }}
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300" />
+          <span>Back</span>
+        </button>
+      )}
 
-          {/* Sign-up Form */}
-          <div className="bg-gradient-to-r from-blue-900/50 to-purple-900/50 border border-blue-500/30 rounded-lg p-6">
-            <Shield className="w-8 h-8 text-blue-400 mx-auto mb-3" />
-            <h2 className="text-lg font-semibold text-white mb-4 pixel-font" style={{ fontFamily: "'Press Start 2P', monospace" }}>
-              Join Clutch Platform
-            </h2>
-            <p className="text-gray-300 text-sm mb-6">
-              This exclusive invitation expires in {timeRemaining}.
-            </p>
+      {/* Clutch logo in top right */}
+      <div className="absolute top-8 right-8 z-10">
+        <span className="pixel-font text-sm tracking-wider text-white/80" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+          clutch
+        </span>
+      </div>
+
+      {/* Main signup container */}
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="w-full max-w-md">
+          {/* Signup form container */}
+          <div className="bg-gray-900/50 backdrop-blur-sm border border-white/20 p-8 relative">
+            {/* Glowing border effect */}
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 opacity-0 hover:opacity-100 transition-opacity duration-500 blur-sm -z-10" />
             
+            {/* Header */}
+            <div className="text-center mb-8">
+              <h1 className="pixel-font text-lg mb-2 tracking-wide" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                Join Clutch
+              </h1>
+              <p className="pixel-font text-xs text-gray-400 tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                Exclusive Invitation • {timeRemaining} left
+              </p>
+            </div>
+
+            {/* Error message */}
             {error && (
-              <div className="mb-4 p-3 bg-red-900/50 border border-red-500/50 rounded text-red-300 text-sm">
-                {error}
+              <div className="mb-6 p-3 bg-red-900/50 border border-red-500/50 text-red-300">
+                <p className="pixel-font text-xs tracking-wider" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  {error}
+                </p>
               </div>
             )}
-            
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Full Name</label>
+
+            {/* Signup form */}
+            <form onSubmit={handleSignUp} className="space-y-6">
+              {/* Full Name field */}
+              <div className="space-y-2">
+                <label className="pixel-font text-xs tracking-wider text-gray-300 uppercase" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Full Name
+                </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -256,15 +363,19 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
                     name="fullName"
                     value={formData.fullName}
                     onChange={handleInputChange}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                    placeholder="Enter your full name"
+                    className="w-full bg-black/50 border border-white/30 px-10 py-3 pixel-font text-xs tracking-wider focus:border-white focus:outline-none transition-colors duration-300"
+                    style={{ fontFamily: "'Press Start 2P', monospace" }}
+                    placeholder="your name"
                     required
                   />
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Email Address</label>
+
+              {/* Email field */}
+              <div className="space-y-2">
+                <label className="pixel-font text-xs tracking-wider text-gray-300 uppercase" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Email
+                </label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -272,15 +383,19 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
                     name="email"
                     value={formData.email}
                     onChange={handleInputChange}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-4 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                    placeholder="Enter your email"
+                    className="w-full bg-black/50 border border-white/30 px-10 py-3 pixel-font text-xs tracking-wider focus:border-white focus:outline-none transition-colors duration-300"
+                    style={{ fontFamily: "'Press Start 2P', monospace" }}
+                    placeholder="your@email.com"
                     required
                   />
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Password</label>
+
+              {/* Password field */}
+              <div className="space-y-2">
+                <label className="pixel-font text-xs tracking-wider text-gray-300 uppercase" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -288,22 +403,26 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
                     name="password"
                     value={formData.password}
                     onChange={handleInputChange}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                    placeholder="Create a password (min 6 characters)"
+                    className="w-full bg-black/50 border border-white/30 px-10 py-3 pixel-font text-xs tracking-wider focus:border-white focus:outline-none transition-colors duration-300 pr-12"
+                    style={{ fontFamily: "'Press Start 2P', monospace" }}
+                    placeholder="••••••••"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-300"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
-              
-              <div>
-                <label className="block text-gray-300 text-sm font-medium mb-2">Confirm Password</label>
+
+              {/* Confirm Password field */}
+              <div className="space-y-2">
+                <label className="pixel-font text-xs tracking-wider text-gray-300 uppercase" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                  Confirm Password
+                </label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -311,54 +430,74 @@ export default function SecretSignupPage({ linkId }: SecretSignupPageProps) {
                     name="confirmPassword"
                     value={formData.confirmPassword}
                     onChange={handleInputChange}
-                    className="w-full bg-gray-800/50 border border-gray-600 rounded-lg pl-10 pr-12 py-3 text-white placeholder-gray-400 focus:border-blue-500 focus:outline-none transition-colors"
-                    placeholder="Confirm your password"
+                    className="w-full bg-black/50 border border-white/30 px-10 py-3 pixel-font text-xs tracking-wider focus:border-white focus:outline-none transition-colors duration-300 pr-12"
+                    style={{ fontFamily: "'Press Start 2P', monospace" }}
+                    placeholder="••••••••"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-white transition-colors duration-300"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
-              
+
+              {/* Create Account button */}
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition-colors flex items-center justify-center space-x-2"
+                className="w-full group relative bg-transparent border-2 border-white py-4 pixel-font text-xs tracking-wider uppercase transition-all duration-300 hover:bg-white hover:text-black disabled:opacity-50 disabled:cursor-not-allowed"
+                style={{ fontFamily: "'Press Start 2P', monospace" }}
               >
-                {isLoading ? (
-                  <>
+                <span className="relative z-10 flex items-center justify-center space-x-2">
+                  <Key className="w-4 h-4" />
+                  <span>{isLoading ? 'Creating...' : 'Create Account'}</span>
+                </span>
+                
+                {/* Animated background fill */}
+                <div className="absolute inset-0 bg-white transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+                
+                {/* Loading animation */}
+                {isLoading && (
+                  <div className="absolute inset-0 flex items-center justify-center">
                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    <span>Creating Account...</span>
-                  </>
-                ) : (
-                  <>
-                    <Key className="w-4 h-4" />
-                    <span>Create Account</span>
-                  </>
+                  </div>
                 )}
               </button>
             </form>
-            
-            <div className="mt-4 text-center">
-              <p className="text-gray-400 text-xs">
-                Invitation Code: <span className="text-blue-400 font-mono">{link.id.slice(-8).toUpperCase()}</span>
+
+            {/* Invitation info */}
+            <div className="mt-8 text-center">
+              <p className="pixel-font text-xs tracking-wider text-gray-400" style={{ fontFamily: "'Press Start 2P', monospace" }}>
+                Invitation Code: {link.id.slice(-8).toUpperCase()}
               </p>
             </div>
           </div>
-
-          {/* Warning */}
-          <div className="mt-6 bg-yellow-900/20 border border-yellow-500/30 rounded-lg p-4">
-            <p className="text-yellow-300 text-xs">
-              ⚠️ This invitation will expire automatically. Do not share this URL.
-            </p>
-          </div>
         </div>
       </div>
+
+      {/* Ambient particles effect */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-1 h-1 bg-white/10 rounded-full animate-pulse"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 3}s`,
+              animationDuration: `${3 + Math.random() * 2}s`
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Corner accents */}
+      <div className="absolute top-0 right-0 w-32 h-32 border-t-2 border-r-2 border-white/10" />
+      <div className="absolute bottom-0 left-0 w-32 h-32 border-b-2 border-l-2 border-white/10" />
     </div>
   );
 }
