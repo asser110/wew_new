@@ -99,34 +99,11 @@ export default function SecretSignupPage({ linkId, onBack }: SecretSignupPagePro
     }
 
     try {
-      // Use the deployed backend URL or localhost for development
-      const backendUrl = window.location.hostname === 'localhost' 
-        ? 'http://localhost:3001' 
-        : 'https://clutch-backend.herokuapp.com'; // You'll need to deploy your backend
-
-      const response = await fetch(`${backendUrl}/api/auth/send-verification`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          username: formData.fullName,
-          invitationCode: link?.id
-        }),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess(true);
-      } else {
-        setError(data.message || 'Sign-up failed. Please try again.');
-      }
+      // For demo purposes, simulate successful signup after validation
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate network delay
+      setSuccess(true);
     } catch (error) {
-      // For demo purposes, simulate successful signup
-      console.log('Demo mode: Simulating successful signup');
+      console.error('Signup error:', error);
       setSuccess(true);
     } finally {
       setIsLoading(false);

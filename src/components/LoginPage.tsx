@@ -3,9 +3,10 @@ import { Eye, EyeOff, ArrowLeft, User, Lock, Mail, Shield } from 'lucide-react';
 
 interface LoginPageProps {
   onBack: () => void;
+  onLoginSuccess: () => void;
 }
 
-function LoginPage({ onBack }: LoginPageProps) {
+function LoginPage({ onBack, onLoginSuccess }: LoginPageProps) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [verificationCode, setVerificationCode] = useState('');
@@ -65,9 +66,8 @@ function LoginPage({ onBack }: LoginPageProps) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
         
-        // Redirect to dashboard or main app
-        console.log('Login successful:', data);
-        alert('Login successful! Welcome to Clutch.');
+        // Call success callback to show home page
+        onLoginSuccess();
       } else {
         setError(data.message || 'Verification failed');
       }

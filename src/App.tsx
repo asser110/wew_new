@@ -197,7 +197,27 @@ function App() {
   };
 
   if (showLogin) {
-    return <LoginPage onBack={() => setShowLogin(false)} />;
+    return (
+      <LoginPage 
+        onBack={() => setShowLogin(false)} 
+        onLoginSuccess={() => {
+          setShowLogin(false);
+          setShowHomePage(true);
+        }}
+      />
+    );
+  }
+
+  if (showHomePage) {
+    return (
+      <HomePage 
+        onLogout={() => {
+          setShowHomePage(false);
+          setShowLogin(false);
+          setShowSecretGenerator(false);
+        }}
+      />
+    );
   }
 
   if (showSecretGenerator) {
